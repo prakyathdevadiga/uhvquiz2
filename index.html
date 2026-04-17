@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UHV Quiz - Unit II</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .setup-section {
+            display: block;
+        }
+
+        .quiz-section {
+            display: none;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .question-limit-section {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .question-limit-section label {
+            display: block;
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .limit-input-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        input[type="number"] {
+            width: 120px;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .limit-info {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .question-counter {
+            text-align: right;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            padding: 18px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover:not(.disabled):not(.revealed) {
+            border-color: #667eea;
+            background: #f0f3ff;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #e8ecff;
+        }
+
+        .option.correct {
+            border-color: #4caf50;
+            background: #e8f5e9;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .option.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+            animation: shake 0.5s ease;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .option.revealed {
+            cursor: default;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .option-letter {
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .option.correct .option-letter {
+            background: #4caf50;
+        }
+
+        .option.incorrect .option-letter {
+            background: #f44336;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 1rem;
+            color: #444;
+        }
+
+        .option-icon {
+            font-size: 1.5rem;
+            margin-left: 10px;
+        }
+
+        .feedback-banner {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback-banner.correct {
+            display: block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+
+        .feedback-banner.incorrect {
+            display: block;
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #f44336;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+        }
+
+        .score-inner {
+            width: 130px;
+            height: 130px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .score-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .result-message {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .result-details {
+            color: #666;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .review-section {
+            margin-top: 30px;
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .review-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .review-item.correct-review {
+            border-left-color: #4caf50;
+        }
+
+        .review-item.incorrect-review {
+            border-left-color: #f44336;
+        }
+
+        .review-question {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .review-answer {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Section -->
+        <div id="setupSection" class="card setup-section">
+            <h1>🎯 UHV Unit II Quiz</h1>
+            <p class="subtitle">Test your knowledge of Human Values</p>
+            
+            <div class="question-limit-section">
+                <label for="questionLimit">How many questions would you like to attempt?</label>
+                <div class="limit-input-wrapper">
+                    <input type="number" id="questionLimit" min="1" max="55" value="10">
+                    <span class="limit-info">Max: 55 questions available</span>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn" onclick="startQuiz()">Start Quiz</button>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quizSection" class="card quiz-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            
+            <div class="question-counter" id="questionCounter">Question 1 of 10</div>
+            
+            <div class="question-text" id="questionText">Loading...</div>
+            
+            <!-- Feedback Banner -->
+            <div id="feedbackBanner" class="feedback-banner"></div>
+            
+            <div class="options-container" id="optionsContainer"></div>
+            
+            <div class="nav-buttons">
+                <button class="btn-secondary" id="prevBtn" onclick="previousQuestion()" style="visibility: hidden;">← Previous</button>
+                <button class="btn" id="nextBtn" onclick="nextQuestion()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="card results-section">
+            <h1>Quiz Completed! 🎉</h1>
+            
+            <div class="score-circle">
+                <div class="score-inner">
+                    <div class="score-number" id="scoreNumber">0%</div>
+                    <div class="score-label">Score</div>
+                </div>
+            </div>
+            
+            <div class="result-message" id="resultMessage"></div>
+            <div class="result-details" id="resultDetails"></div>
+            
+            <div style="text-align: center;">
+                <button class="btn" onclick="restartQuiz()">Try Again</button>
+            </div>
+            
+            <div class="review-section" id="reviewSection"></div>
+        </div>
+    </div>
+
+    <script>
+        // Original questions data from the PDF
+        const originalQuestions = [
+            {
+                question: "Employing the body physically for the production and maintenance of physical facilities is called as",
+                options: ["Asan", "Pranayam", "Labour", "None of these"],
+                correct: 2
+            },
+            {
+                question: "Trust, Respect, Happiness, etc., are the needs of",
+                options: ["The Body", "The Self (I)", "The Self and the Body", "None of these"],
+                correct: 1
+            },
+            {
+                question: "The activities of the body (in response) are",
+                options: ["Assuming and Knowing", "Assuming and Fulfilling", "Recognising and Fulfilling", "Knowing and Fulfilling"],
+                correct: 1
+            },
+            {
+                question: "'Seer' means the one that",
+                options: ["Does something", "understands", "Experience", "All of these"],
+                correct: 1
+            },
+            {
+                question: "Who is responsible for happiness and unhappiness?",
+                options: ["Body", "Self", "Outside situations", "Society"],
+                correct: 1
+            },
+            {
+                question: "Human body is an instrument to facilitate",
+                options: ["Sensations", "Preconditioning", "Right Understanding", "Assumptions"],
+                correct: 2
+            },
+            {
+                question: "When we assume something on the basis of prevailing notion, then it is called as",
+                options: ["Preconditioning", "Sensation", "Right Understanding", "Natural Acceptance"],
+                correct: 0
+            },
+            {
+                question: "Behaviour on the basis of right understanding and realization is called",
+                options: ["Confused behaviour", "Wrong behaviour", "Self organized behaviour", "All of these"],
+                correct: 2
+            },
+            {
+                question: "The activity of selecting/tasting is",
+                options: ["Continuous", "Variable", "Uncertain", "None of these"],
+                correct: 0
+            },
+            {
+                question: "The power/force for the activity of analyzing is",
+                options: ["Desire", "Expectations", "Realization", "Thoughts"],
+                correct: 3
+            },
+            {
+                question: "When there is harmony among the parts of the body, then it is called a status of",
+                options: ["Sanyam", "Swasthya", "Both Sanyam and Swasthya", "None of these"],
+                correct: 2
+            },
+            {
+                question: "Harmony should be maintained between",
+                options: ["Body and Life", "Self and Society", "Society and Environment", "All of these"],
+                correct: 3
+            },
+            {
+                question: "The statement 'all parts of the body performing their expected functions' is related with",
+                options: ["Proper upkeep", "Self regulation", "Sanyam", "Swasthya"],
+                correct: 3
+            },
+            {
+                question: "__________ is the central to the human existence",
+                options: ["Body", "Self", "Physical facilities", "None of these"],
+                correct: 1
+            },
+            {
+                question: "Realization is the activity of",
+                options: ["Self", "Body", "Both Self and Body", "None of these"],
+                correct: 0
+            },
+            {
+                question: "'Seeing the Self by the Self' means",
+                options: ["The conscious observation of the consciousness", "The conscious observation of the material", "The conscious observation of the co-existence", "None of these"],
+                correct: 0
+            },
+            {
+                question: "Activities of the body are",
+                options: ["Temporary in Time", "Continuous in Time", "Discrete in nature", "None of these"],
+                correct: 1
+            },
+            {
+                question: "__________ is central to existence",
+                options: ["Body", "Physical facility", "Co-existence", "Self"],
+                correct: 3
+            },
+            {
+                question: "Which of the following does not lead right understanding in the Self (I)",
+                options: ["A process of do's don'ts, in which we assume what is being said without verification", "A process of self-verification on your own right", "Verification of the proposals on the basis of natural acceptance", "Verification through experiential validation"],
+                correct: 0
+            },
+            {
+                question: "Which one of the following is correct?",
+                options: ["Self = Body", "Self and Body are in co-existence", "Needs of the Self and Body are same", "All are correct"],
+                correct: 1
+            },
+            {
+                question: "Need of the Self is",
+                options: ["Temporary", "Quantitative", "Qualitative", "None of these"],
+                correct: 2
+            },
+            {
+                question: "The 'I' is",
+                options: ["The doer", "The enjoyer", "The Seer", "All of these"],
+                correct: 3
+            },
+            {
+                question: "The responses of the Self are:",
+                options: ["Knowing and Fulfilling", "Knowing, Assuming, Recognising, and Fulfilling", "Knowing and Recognising", "Knowing, Recognising and Fulfilling"],
+                correct: 3
+            },
+            {
+                question: "The needs of the Self are fulfilled by",
+                options: ["Right Understanding and Right Feeling", "Right Feeling", "Right Understanding", "Cannot be decided"],
+                correct: 0
+            },
+            {
+                question: "Which is material unit?",
+                options: ["Body", "Physical facility", "Physiochemical things", "All of these"],
+                correct: 3
+            },
+            {
+                question: "Which among the following is not an activity of the body",
+                options: ["Assuming", "Recognizing", "Fulfilling", "All of these"],
+                correct: 3
+            },
+            {
+                question: "Self organization means",
+                options: ["Innateness", "Co-existence", "Natural characteristics", "Form"],
+                correct: 0
+            },
+            {
+                question: "The Body is a __________ unit; while the Self is a",
+                options: ["Consciousness and Qualitative", "Material, Consciousness", "Consciousness, Material", "Quantitative, Material"],
+                correct: 1
+            },
+            {
+                question: "Which among the following is a variable unit?",
+                options: ["Form", "Co-existence", "Innateness", "All of these"],
+                correct: 0
+            },
+            {
+                question: "__________ is done with the help of proper food, water and",
+                options: ["Protection of the body", "Right utilization of the body", "Nourishment of the body", "Exploitation of the body"],
+                correct: 2
+            },
+            {
+                question: "What is not the indicator of good health of the Self and Body",
+                options: ["Feeling of self-regulation of the body", "Feeling of happiness and prosperity", "Feeling of jealousy, anger and competition for others", "None of these"],
+                correct: 2
+            },
+            {
+                question: "When we try to achieve happiness and prosperity by maximizing accumulation and consumption of physical facilities as our primary and only focus of life, we become",
+                options: ["Anti-social", "Anti-ecological", "Threat to human survival", "All of these"],
+                correct: 3
+            },
+            {
+                question: "On having realization and understanding, we get",
+                options: ["Assurance", "Satisfaction", "Universality", "All of these"],
+                correct: 3
+            },
+            {
+                question: "Physical facilities are required in __________ quantity",
+                options: ["Uncertain", "Limited", "Unlimited", "Insignificant"],
+                correct: 1
+            },
+            {
+                question: "Doer means the one who",
+                options: ["Understands", "Does something", "Experience", "All of these"],
+                correct: 1
+            },
+            {
+                question: "The basic unit of learning human interaction is",
+                options: ["Society", "School", "Family", "Nature"],
+                correct: 2
+            },
+            {
+                question: "In Value Education 'Sanyam' means",
+                options: ["Self exploration", "Self evaluation", "Self regulation", "None of these"],
+                correct: 2
+            },
+            {
+                question: "'Sanyam' is feeling of responsibility for __________ of the body",
+                options: ["Nurturing and protection", "Protection and right utilization", "Nurturing and right utilization", "Nurturing, Protection and Right Utilization"],
+                correct: 3
+            },
+            {
+                question: "The pleasure obtained from sensations is",
+                options: ["Temporary and source of long lasting happiness", "Continuous and source of long lasting happiness", "Short lived and continuous", "Short lived and temporary"],
+                correct: 3
+            },
+            {
+                question: "We should make choices with external world based on our",
+                options: ["Natural acceptance", "Preconditioning", "Sensations", "All of these"],
+                correct: 0
+            },
+            {
+                question: "The Self reads the __________ and gives the __________ to the body",
+                options: ["Instructions, Information", "Instructions, Sensation", "Sensation, Instruction", "Sensation, Information"],
+                correct: 2
+            },
+            {
+                question: "What leads to Resolution?",
+                options: ["Assuming", "Knowing", "Recognising", "Fulfilling"],
+                correct: 1
+            },
+            {
+                question: "Which of the following is temporary in existence?",
+                options: ["Space", "Consciousness", "Material unit", "Co-existence"],
+                correct: 2
+            },
+            {
+                question: "Which of the following is 'ever' in existence?",
+                options: ["Space", "Consciousness", "Material unit", "None of these"],
+                correct: 0
+            },
+            {
+                question: "Which of the following is continuous in existence",
+                options: ["Space", "Consciousness", "Material unit", "None of these"],
+                correct: 1
+            },
+            {
+                question: "Which among the following in not a characteristic of 'consciousness'?",
+                options: ["Cyclic development", "Temporary", "Continuous", "Recognising"],
+                correct: 1
+            },
+            {
+                question: "__________ wants to live with continuous happiness",
+                options: ["Body", "Self", "Plant and animals", "Material unit"],
+                correct: 1
+            },
+            {
+                question: "__________ is just used as an instrument of __________",
+                options: ["Body, Self", "Self, Body", "Physical facility, Self", "Imagination, Preconditioning"],
+                correct: 0
+            },
+            {
+                question: "Find the wrong statement from the following:",
+                options: ["Self is seer/viewer", "Self is doer (decision maker)", "Self is enjoyer (the one who experiences)", "Self is an instrument of the body"],
+                correct: 3
+            },
+            {
+                question: "Find the wrong statement",
+                options: ["'seer' means one that sees/understands", "All the 5 senses are just the instruments enable the Self to see something from outside", "All in the process of seeing, the Self is used as an instrument", "You can also see within, without using the sensations"],
+                correct: 2
+            },
+            {
+                question: "Which of the following is a wrong statement?",
+                options: ["Self is the one who decides – what to do and what not to do.", "The body is used to express the decision of the Self, if required.", "Self may or may not use the body to execute its decisions", "What I think is the decision of my body"],
+                correct: 3
+            },
+            {
+                question: "Which of the following is not a correct statement as far as the relationship of the Body and Self is concerned?",
+                options: ["It is my Self that experiences happiness and unhappiness", "It is my body that enjoys the taste of food", "It is my Self that feels enthused and depressed", "It is my Self that feels angry and delighted"],
+                correct: 1
+            },
+            {
+                question: "Which among the following statement is correct about the physical facility?",
+                options: ["Physical facilities are required to fulfill the responsibility of the Self toward body", "Physical facilities are required to keep the body in good health by nurturing, protection and right utilization of the body.", "The required physical facilities could be recognised along with the required quantity for the nurturing, protection and utilization of the body", "All of these"],
+                correct: 3
+            },
+            {
+                question: "What does right utilization of body mean?",
+                options: ["Use the body as an instrument of communication (behaviour)", "Use the body as an instrument of labour/work, to obtain necessary physical facility for the body", "As an instrument for the continuity of human tradition", "All of these"],
+                correct: 3
+            },
+            {
+                question: "Right utilization ensured of",
+                options: ["Physical facilities", "Body", "Self", "All of these"],
+                correct: 3
+            }
+        ];
+
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let questionLimit = 10;
+        let hasAnsweredCurrent = false;
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function randomizeOptions(question) {
+            const optionsWithIndex = question.options.map((opt, idx) => ({
+                text: opt,
+                originalIndex: idx
+            }));
+            
+            const shuffledOptions = shuffleArray(optionsWithIndex);
+            const newCorrectIndex = shuffledOptions.findIndex(opt => opt.originalIndex === question.correct);
+            
+            return {
+                question: question.question,
+                options: shuffledOptions.map(opt => opt.text),
+                correct: newCorrectIndex,
+                originalCorrect: question.options[question.correct]
+            };
+        }
+
+        function startQuiz() {
+            const limitInput = document.getElementById('questionLimit');
+            questionLimit = parseInt(limitInput.value) || 10;
+            
+            if (questionLimit < 1) questionLimit = 1;
+            if (questionLimit > originalQuestions.length) questionLimit = originalQuestions.length;
+            
+            // Shuffle and select questions
+            const shuffledQuestions = shuffleArray(originalQuestions).slice(0, questionLimit);
+            
+            // Randomize options for each question
+            questions = shuffledQuestions.map(q => randomizeOptions(q));
+            
+            currentQuestionIndex = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            hasAnsweredCurrent = false;
+            
+            // Hide setup, show quiz
+            document.getElementById('setupSection').style.display = 'none';
+            const quizSection = document.getElementById('quizSection');
+            quizSection.style.display = 'block';
+            quizSection.classList.add('fade-in');
+            
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            hasAnsweredCurrent = userAnswers[currentQuestionIndex] !== null;
+            
+            // Hide feedback banner
+            const feedbackBanner = document.getElementById('feedbackBanner');
+            feedbackBanner.className = 'feedback-banner';
+            feedbackBanner.style.display = 'none';
+            
+            // Update progress
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Update counter
+            document.getElementById('questionCounter').textContent = 
+                `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            
+            // Display question
+            document.getElementById('questionText').textContent = 
+                `${currentQuestionIndex + 1}. ${question.question}`;
+            
+            // Display options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            const letters = ['A', 'B', 'C', 'D'];
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.dataset.index = index;
+                
+                // If already answered, show the result
+                if (hasAnsweredCurrent) {
+                    optionDiv.classList.add('revealed', 'disabled');
+                    if (index === question.correct) {
+                        optionDiv.classList.add('correct');
+                    } else if (index === userAnswers[currentQuestionIndex]) {
+                        optionDiv.classList.add('incorrect');
+                    }
+                } else if (userAnswers[currentQuestionIndex] === index) {
+                    optionDiv.classList.add('selected');
+                }
+                
+                let iconHtml = '';
+                if (hasAnsweredCurrent) {
+                    if (index === question.correct) {
+                        iconHtml = '<span class="option-icon">✓</span>';
+                    } else if (index === userAnswers[currentQuestionIndex]) {
+                        iconHtml = '<span class="option-icon">✗</span>';
+                    }
+                }
+                
+                optionDiv.innerHTML = `
+                    <div class="option-letter">${letters[index]}</div>
+                    <div class="option-text">${option}</div>
+                    ${iconHtml}
+                `;
+                
+                if (!hasAnsweredCurrent) {
+                    optionDiv.onclick = function() { selectOption(index); };
+                }
+                
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            // Show feedback if already answered
+            if (hasAnsweredCurrent) {
+                showFeedback(userAnswers[currentQuestionIndex] === question.correct);
+            }
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').style.visibility = 
+                currentQuestionIndex === 0 ? 'hidden' : 'visible';
+            
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.textContent = 'Finish →';
+            } else {
+                nextBtn.textContent = 'Next →';
+            }
+        }
+
+        function selectOption(index) {
+            if (hasAnsweredCurrent) return;
+            
+            const question = questions[currentQuestionIndex];
+            const isCorrect = index === question.correct;
+            
+            userAnswers[currentQuestionIndex] = index;
+            hasAnsweredCurrent = true;
+            
+            // Update visual selection and reveal correct answer
+            const options = document.querySelectorAll('.option');
+            options.forEach((opt, i) => {
+                opt.classList.add('revealed', 'disabled');
+                opt.onclick = null;
+                
+                if (i === question.correct) {
+                    opt.classList.add('correct');
+                    opt.innerHTML += '<span class="option-icon">✓</span>';
+                } else if (i === index) {
+                    opt.classList.add('incorrect');
+                    opt.innerHTML += '<span class="option-icon">✗</span>';
+                }
+            });
+            
+            // Show feedback banner
+            showFeedback(isCorrect);
+        }
+
+        function showFeedback(isCorrect) {
+            const feedbackBanner = document.getElementById('feedbackBanner');
+            feedbackBanner.style.display = 'block';
+            
+            if (isCorrect) {
+                feedbackBanner.className = 'feedback-banner correct';
+                feedbackBanner.innerHTML = '✓ Correct! Well done!';
+            } else {
+                const correctOption = questions[currentQuestionIndex].options[questions[currentQuestionIndex].correct];
+                feedbackBanner.className = 'feedback-banner incorrect';
+                feedbackBanner.innerHTML = `✗ Incorrect! The correct answer is: <strong>${correctOption}</strong>`;
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizSection').style.display = 'none';
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.style.display = 'block';
+            resultsSection.classList.add('fade-in');
+            
+            // Calculate score
+            let correctCount = 0;
+            questions.forEach((q, i) => {
+                if (userAnswers[i] === q.correct) {
+                    correctCount++;
+                }
+            });
+            
+            const percentage = Math.round((correctCount / questions.length) * 100);
+            
+            // Animate score
+            animateScore(percentage);
+            
+            // Set message
+            let message = '';
+            if (percentage >= 80) {
+                message = 'Outstanding! Excellent understanding! 🌟';
+            } else if (percentage >= 60) {
+                message = 'Good job! Keep learning! 👍';
+            } else if (percentage >= 40) {
+                message = 'Not bad! Room for improvement! 📚';
+            } else {
+                message = 'Keep practicing! You can do better! 💪';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultDetails').textContent = 
+                `You answered ${correctCount} out of ${questions.length} questions correctly`;
+            
+            // Show review
+            showReview();
+        }
+
+        function animateScore(targetPercentage) {
+            const scoreElement = document.getElementById('scoreNumber');
+            let current = 0;
+            const increment = targetPercentage / 50;
+            const timer = setInterval(function() {
+                current += increment;
+                if (current >= targetPercentage) {
+                    current = targetPercentage;
+                    clearInterval(timer);
+                }
+                scoreElement.textContent = Math.round(current) + '%';
+            }, 20);
+        }
+
+        function showReview() {
+            const reviewSection = document.getElementById('reviewSection');
+            reviewSection.innerHTML = '<h3 style="margin-bottom: 20px; color: #333;">Review Answers</h3>';
+            
+            questions.forEach((q, i) => {
+                const isCorrect = userAnswers[i] === q.correct;
+                const userAnswer = userAnswers[i] !== null ? q.options[userAnswers[i]] : 'Not answered';
+                const correctAnswer = q.options[q.correct];
+                
+                const reviewItem = document.createElement('div');
+                reviewItem.className = 'review-item ' + (isCorrect ? 'correct-review' : 'incorrect-review');
+                
+                reviewItem.innerHTML = `
+                    <div class="review-question">${i + 1}. ${q.question}</div>
+                    <div class="review-answer">
+                        <strong>Your answer:</strong> ${userAnswer} ${isCorrect ? '✓' : '✗'}<br>
+                        ${!isCorrect ? `<strong>Correct answer:</strong> ${correctAnswer}` : ''}
+                    </div>
+                `;
+                
+                reviewSection.appendChild(reviewItem);
+            });
+        }
+
+        function restartQuiz() {
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('setupSection').style.display = 'block';
+            
+            // Reset variables
+            questions = [];
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            hasAnsweredCurrent = false;
+        }
+
+        // Allow Enter key to start quiz
+        document.getElementById('questionLimit').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startQuiz();
+            }
+        });
+    </script>
+</body>
+</html>
